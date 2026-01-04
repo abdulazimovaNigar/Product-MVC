@@ -15,8 +15,11 @@ public class ProductCreateVM
     public string? SKU { get; set; }
     public int Rating { get; set; }
     public int CategoryId { get; set; }
+    public int BrandId { get; set; }
     [Required]
     public IFormFile MainImage { get; set; }
     [Required]
     public IFormFile HoverImage { get; set; }
+    public List<int> TagIds { get; set; }
+    public List<IFormFile> Images { get; set; } = [];
 }
