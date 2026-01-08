@@ -1,0 +1,20 @@
+﻿@model CategoryUpdateVM
+
+<div class="container">
+    <div class="row">
+        <form method="post">
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <a asp-area="Admin" asp-controller="Category" asp-action="Update" class="btn btn-secondary mt-3">Cancel</a>
+
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        </form>
+    </div>
+</div>

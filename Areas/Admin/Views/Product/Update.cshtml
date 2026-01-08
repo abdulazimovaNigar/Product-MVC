@@ -1,0 +1,122 @@
+﻿@model ProductUpdateVM
+
+<div class="container">
+    <div class="row">
+        <form method="post" enctype="multipart/form-data">
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <img src="~/assets/images/website-images/@Model.MainImagePath" width="50" height="50" />
+                <input type="hidden" asp-for="MainImagePath" />
+                <label asp-for="MainImage"></label>
+                <input asp-for="MainImage" class="form-control" />
+                <span asp-validation-for="MainImage" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <img src="~/assets/images/website-images/@Model.HoverImagePath" width="50" height="50" />
+                <input type="hidden" asp-for="HoverImagePath" />
+                <label asp-for="HoverImage"></label>
+                <input asp-for="HoverImage" class="form-control" />
+                <span asp-validation-for="HoverImage" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+            
+
+                @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                    {
+                   
+                    <div style="position:relative;width:50px;height:50px">
+                        <span style="position:absolute;right:5px;top:-40px;background-color:red;color:white;padding:8px;font-size:8px;cursor:pointer" class="removeBtn">x</span>
+                        <img src="~/assets/images/website-images/@Model.ImageUrls[i]" width="50" height="50" />
+                        <input type="hidden" asp-for="ImageUrls" value="@Model.ImageUrls[i]" />
+                        <input type="hidden" asp-for="ImageIds" value="@Model.ImageIds[i]" />
+                    </div>
+                    }
+                <label asp-for="Images"></label>
+                <input asp-for="Images" class="form-control" />
+                <span asp-validation-for="Images" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SKU"></label>
+                <input asp-for="SKU" class="form-control" />
+                <span asp-validation-for="SKU" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Rating"></label>
+                <input asp-for="Rating" class="form-control" />
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CategoryId"></label>
+                <select asp-for="CategoryId" class="form-control">
+                    @foreach (Category category in ViewBag.Categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BrandId"></label>
+                <select asp-for="BrandId" class="form-control">
+                    @foreach (Brand brand in ViewBag.Brands)
+                    {
+                        <option value="@brand.Id">@brand.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TagIds"></label>
+                <select asp-for="TagIds" class="form-control">
+                    @foreach (Tag tag in ViewBag.Tags)
+                    {
+                        <option value="@tag.Id">@tag.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="TagIds" class="text-danger"></span>
+            </div>
+
+            <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const removeButtons=document.querySelectorAll(".removeBtn");
+    removeButtons.forEach(x=>{
+        x.addEventListener("click",(e)=>{
+            e.preventDefault();
+
+            x.parentElement.remove();
+        });
+    })
+</script>

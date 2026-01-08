@@ -1,0 +1,67 @@
+﻿@using ProductMVC.ViewModels.BrandViewModel
+@model List<BrandGetVM>
+
+<div class="container">
+    <div class="row">
+        <div class="row">
+            <a class="btn btn-success" asp-action="Create">Create</a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var brand in Model)
+                {
+                    <tr>
+                        <th scope="row">@brand.Id</th>
+                        <td>@brand.Name</td>
+                        <td>
+                            <a asp-area="admin" asp-action="update" asp-route-id="@brand.Id"
+                               class="btn btn-warning">Update</a>
+
+                            <a asp-area="admin" asp-action="delete" asp-route-id="@brand.Id"
+                               class="btn btn-danger deleteBtn">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>s
+        </table>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const deleteButtons = document.querySelectorAll(".deleteBtn");
+    deleteButtons.forEach(btn =>{
+        btn.addEventListener('click',(e) =>{
+            e.preventDefault();
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your file has been deleted.",
+                    icon: "success"
+                });
+
+
+                window.location.href = btn.href;
+                }
+            });
+        })
+    })
+</script>

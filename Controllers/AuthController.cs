@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ProductMVC.Abstraction;
 using ProductMVC.Contexts;
 using ProductMVC.Models;
 using ProductMVC.ViewModels.AuthViewModel;
@@ -14,13 +15,15 @@ namespace ProductMVC.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
-        public AuthController(ProniaDbContext context, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        private readonly IEmailService _emailService;
+        public AuthController(ProniaDbContext context, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         public IActionResult Register()
@@ -66,9 +69,14 @@ namespace ProductMVC.Controllers
                 return View(vm);
             }
 
-            await _signInManager.SignInAsync(user, false);
 
-            return RedirectToAction("Index", "Home");
+            await SendConfirmationMailAsync(user);
+
+            TempData["SuccessMessage"] = "Please confirm your email";
+
+
+
+            return RedirectToAction("Login");
         }
 
         public IActionResult Login()
@@ -98,7 +106,15 @@ namespace ProductMVC.Controllers
                 return View(vm);
             }
 
+            if (!user.EmailConfirmed)
+            {
+                ModelState.AddModelError("", "Please confirm your email");
+                await SendConfirmationMailAsync(user);
+                return View(vm);
+            }
+
             await _signInManager.SignInAsync(user, vm.IsRemember);
+
 
             return RedirectToAction("Index", "Home");
 
@@ -161,6 +177,59 @@ namespace ProductMVC.Controllers
             return Ok("Created successfully");
 
 
+        }
+
+        private async Task SendConfirmationMailAsync(AppUser user)
+        {
+            string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var url = Url.Action("ConfirmEmail", "Auth", new { token = token, userId = user.Id }, Request.Scheme);
+            string html = $@"
+                            <!DOCTYPE html>
+                            <html>
+                            <body>
+                                <h2>Confirm your email</h2>
+                            
+                                <a href='{url}'
+                                   style='background:#2563eb;color:white;
+                                          padding:10px 20px;border-radius:6px;
+                                          text-decoration:none;font-weight:bold;'>
+                                    Confirm Email
+                                </a>
+                            
+                                <p>If the button doesn't work, use this link:</p>
+                                <p>{url}</p>
+                            </body>
+                            </html>
+                            ";
+
+            await _emailService.SendEmailAsync(
+                user.Email!,
+                "Confirm your email",
+                html
+            );
+
+
+            await _emailService.SendEmailAsync(user.Email!, "Confirm your email", html);
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string token, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest();
+            }
+            await _signInManager.SignInAsync(user, false);
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
